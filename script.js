@@ -1,37 +1,40 @@
 class CRand {
+  // Mirrors glibc's random()/rand() as shared in the referenced GnuRand snippet.
   constructor(seed) {
-    // Mirror glibc's random()/rand() additive generator (mod-less update, Knuth TAOCP 3.2.2)
-    this.MOD = 2147483647n; // 2^31 - 1
-    this.DEG = 31;
-    this.SEP = 3;
+    const MOD31 = 2147483647n;
+    const LEN = 344;
+    const DEG = 31;
 
-    const sanitized = BigInt(seed) % this.MOD || 1n; // glibc treats seed 0 as 1
-    this.state = new Array(this.DEG).fill(0n);
-    this.state[0] = sanitized;
+    this.state = new Array(LEN).fill(0n);
+    const sanitizedSeed = BigInt(seed) % MOD31 || 1n; // glibc treats seed 0 as 1
 
-    for (let i = 1; i < this.DEG; i += 1) {
-      // Park–Miller minimal standard to seed the table
-      this.state[i] = (16807n * this.state[i - 1]) % this.MOD;
+    // Park–Miller to initialize r[0..30]
+    this.state[0] = sanitizedSeed;
+    for (let i = 1; i < DEG; i += 1) {
+      this.state[i] = (16807n * this.state[i - 1]) % MOD31;
     }
 
-    this.fptr = this.SEP;
-    this.rptr = 0;
-
-    // Warm up like glibc: run 10 * DEG iterations
-    for (let i = 0; i < 10 * this.DEG; i += 1) {
-      this.rand();
+    // r[31..33] = r[i-31]
+    for (let i = DEG; i < DEG + 3; i += 1) {
+      this.state[i] = this.state[i - DEG];
     }
+
+    // r[34..343] = r[i-31] + r[i-3] (uint overflow semantics)
+    for (let i = DEG + 3; i < LEN; i += 1) {
+      this.state[i] = (this.state[i - DEG] + this.state[i - 3]) & 0xffffffffn;
+    }
+
+    this.index = 0;
   }
 
   rand() {
-    // Additive feedback: state[fptr] += state[rptr] (no modulus), mask to 31 bits on output
-    this.state[this.fptr] = this.state[this.fptr] + this.state[this.rptr];
-    const result = Number((this.state[this.fptr] >> 1n) & 0x7fffffffn);
-
-    this.fptr = (this.fptr + 1) % this.DEG;
-    this.rptr = (this.rptr + 1) % this.DEG;
-
-    return result;
+    // uint x = r[n % 344] = r[(n + 313) % 344] + r[(n + 341) % 344];
+    const i = this.index % 344;
+    const x =
+      this.state[(this.index + 313) % 344] + this.state[(this.index + 341) % 344];
+    this.state[i] = x & 0xffffffffn; // mimic uint overflow
+    this.index = (this.index + 1) % 344;
+    return Number((this.state[i] >> 1n) & 0x7fffffffn); // (int)(x >> 1)
   }
 }
 
