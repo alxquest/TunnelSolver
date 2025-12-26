@@ -176,6 +176,10 @@ button:disabled {
   font-weight: 700;
 }
 
+.seed-value--name {
+  font-size: 18px;
+}
+
 .muted {
   color: #a7afbf;
 }
@@ -191,6 +195,34 @@ button:disabled {
   margin-top: 14px;
   border-top: 1px solid #1f2634;
   padding-top: 14px;
+}
+
+.how-to {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #0f1115;
+  border: 1px solid #1f2634;
+  display: grid;
+  gap: 10px;
+}
+
+.how-to__figure {
+  margin: 0;
+  background: #0b0e13;
+  border: 1px solid #1f2634;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.how-to__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.how-to__figure figcaption {
+  padding: 8px 10px 10px;
 }
 
 .direction-list {

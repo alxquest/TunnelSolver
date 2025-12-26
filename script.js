@@ -44,11 +44,15 @@ const directionClassMap = {
   right: "direction-right",
 };
 
+const STORAGE_KEY = "tunnelCalculator.lastEntry";
+
 const form = document.getElementById("calculatorForm");
+const characterNameInput = document.getElementById("characterName");
 const playerIdInput = document.getElementById("playerId");
 const tunnelLevelInput = document.getElementById("tunnelLevel");
 const errorMessage = document.getElementById("errorMessage");
 const seedValue = document.getElementById("seedValue");
+const characterNameDisplay = document.getElementById("characterNameDisplay");
 const b1Value = document.getElementById("b1Value");
 const b2Value = document.getElementById("b2Value");
 const cValue = document.getElementById("cValue");
@@ -131,6 +135,7 @@ function updateGridHighlight(directions) {
 function validateInputs() {
   const playerId = Number(playerIdInput.value);
   const level = Number(tunnelLevelInput.value);
+  const characterName = characterNameInput.value.trim();
 
   if (!Number.isInteger(playerId) || playerId < 0) {
     throw new Error("Player ID must be a non-negative integer.");
@@ -140,14 +145,46 @@ function validateInputs() {
     throw new Error("Tunnel level must be at least 1.");
   }
 
-  return { playerId, level };
+  return { playerId, level, characterName };
+}
+
+function loadLastEntry() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const playerId = Number(parsed.playerId);
+    const level = Number(parsed.level);
+    const name = typeof parsed.name === "string" ? parsed.name : "";
+    if (!Number.isInteger(playerId) || !Number.isInteger(level)) {
+      return null;
+    }
+    return { playerId, level, name };
+  } catch (err) {
+    console.warn("Unable to read saved entry", err);
+    return null;
+  }
+}
+
+function persistEntry(entry) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entry));
+  } catch (err) {
+    console.warn("Unable to save entry", err);
+  }
+}
+
+function updateCharacterLabel(name) {
+  const displayName = name && name.trim() ? name.trim() : "—";
+  characterNameDisplay.textContent = displayName;
 }
 
 function calculate() {
   let playerId;
   let level;
+  let characterName;
   try {
-    ({ playerId, level } = validateInputs());
+    ({ playerId, level, characterName } = validateInputs());
     errorMessage.textContent = "";
   } catch (err) {
     errorMessage.textContent = err.message;
@@ -171,6 +208,8 @@ function calculate() {
   b1Value.textContent = `${b1}`;
   b2Value.textContent = `${b2}`;
   cValue.textContent = `${c}`;
+  updateCharacterLabel(characterName);
+  persistEntry({ playerId, level, name: characterName });
 
   updateDirectionBadges([first, second, third, fourth]);
   updateLevelLabels(level);
@@ -201,7 +240,8 @@ form.addEventListener("submit", (event) => {
 prevLevelBtn.addEventListener("click", () => nudgeLevel(-1));
 nextLevelBtn.addEventListener("click", () => nudgeLevel(1));
 
-// Seed with sample data for quick demo
-playerIdInput.value = 57;
-tunnelLevelInput.value = 57;
+const saved = loadLastEntry();
+playerIdInput.value = saved?.playerId ?? 57;
+tunnelLevelInput.value = saved?.level ?? 57;
+characterNameInput.value = saved?.name ?? "";
 calculate();

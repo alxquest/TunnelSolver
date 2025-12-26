@@ -26,6 +26,16 @@
         <h2>Inputs</h2>
         <form id="calculatorForm" class="form-grid">
           <label class="form-field">
+            <span>Character name (optional)</span>
+            <input
+              id="characterName"
+              name="characterName"
+              type="text"
+              placeholder="e.g. Shaman Qrth"
+              autocomplete="name"
+            />
+          </label>
+          <label class="form-field">
             <span>Player ID</span>
             <input
               id="playerId"
@@ -58,6 +68,10 @@
             <p class="muted">Seed (ID × Level)</p>
             <p id="seedValue" class="seed-value">—</p>
           </div>
+          <div>
+            <p class="muted">Character</p>
+            <p id="characterNameDisplay" class="seed-value seed-value--name">—</p>
+          </div>
           <div class="muted random-readout">
             <div>b1 = <span id="b1Value">—</span></div>
             <div>b2 = <span id="b2Value">—</span></div>
@@ -86,6 +100,20 @@
             </li>
           </ul>
         </div>
+
+        <div class="how-to">
+          <h3>How to find your Character ID</h3>
+          <p>
+            The tunnel seed is based on your character's ID. An easy way to find this is to type
+            <code>/playerkiller</code> in-game (this will not turn PK mode on unless you actually type
+            <code>/iwilldie</code>). Note the number the game tells you to type and enter it in the ID field,
+            along with the tunnel level.
+          </p>
+          <figure class="how-to__figure">
+            <img src="assets/playerkiller.svg" alt="In-game prompt showing the /playerkiller confirmation number" />
+            <figcaption class="muted">Example of the <code>/playerkiller</code> prompt showing the character ID.</figcaption>
+          </figure>
+        </div>
       </section>
 
       <section class="panel map-panel">
@@ -110,31 +138,32 @@
               <span>Left</span><span>Middle</span><span>Right</span>
             </div>
             <div class="tunnel-grid">
-              <div class="row-label">Area 1</div>
-              <div class="cell" data-area="1" data-direction="left"></div>
-              <div class="cell" data-area="1" data-direction="middle"></div>
-              <div class="cell" data-area="1" data-direction="right"></div>
-
-              <div class="row-label">Area 2</div>
-              <div class="cell" data-area="2" data-direction="left"></div>
-              <div class="cell" data-area="2" data-direction="middle"></div>
-              <div class="cell" data-area="2" data-direction="right"></div>
+              <div class="row-label">Area 4</div>
+              <div class="cell" data-area="4" data-direction="left"></div>
+              <div class="cell" data-area="4" data-direction="middle"></div>
+              <div class="cell" data-area="4" data-direction="right"></div>
 
               <div class="row-label">Area 3</div>
               <div class="cell" data-area="3" data-direction="left"></div>
               <div class="cell" data-area="3" data-direction="middle"></div>
               <div class="cell" data-area="3" data-direction="right"></div>
 
-              <div class="row-label">Area 4</div>
-              <div class="cell" data-area="4" data-direction="left"></div>
-              <div class="cell" data-area="4" data-direction="middle"></div>
-              <div class="cell" data-area="4" data-direction="right"></div>
+              <div class="row-label">Area 2</div>
+              <div class="cell" data-area="2" data-direction="left"></div>
+              <div class="cell" data-area="2" data-direction="middle"></div>
+              <div class="cell" data-area="2" data-direction="right"></div>
+
+              <div class="row-label">Area 1</div>
+              <div class="cell" data-area="1" data-direction="left"></div>
+              <div class="cell" data-area="1" data-direction="middle"></div>
+              <div class="cell" data-area="1" data-direction="right"></div>
             </div>
           </div>
         </div>
         <p class="map-hint">
           Directions light up the 4×3 tunnel grid (4 areas tall, 3 lanes wide).
-          Use the arrows above to jump to adjacent levels and recalculate
+          Areas now run bottom-to-top (Area 1 on the bottom row, Area 4 on the
+          top). Use the arrows above to jump to adjacent levels and recalculate
           instantly.
         </p>
       </section>
