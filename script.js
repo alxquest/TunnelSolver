@@ -44,6 +44,14 @@ const directionClassMap = {
   right: "direction-right",
 };
 
+const AREA_ONE_BASE_FIRST_PART = 3;
+const AREA_ONE_BASE_SECOND_PART = 2;
+const AREA_ONE_CREEPER_ADDITIONS = {
+  left: [4, 0, 8],
+  middle: [0, 8, 4],
+  right: [8, 4, 0],
+};
+
 const STORAGE_KEY = "tunnelCalculator.lastEntry";
 
 const form = document.getElementById("calculatorForm");
@@ -66,6 +74,37 @@ const nextLevelBtn = document.getElementById("nextLevel");
 const prevLevelLabel = document.getElementById("prevLevelLabel");
 const nextLevelLabel = document.getElementById("nextLevelLabel");
 const currentLevelLabel = document.getElementById("currentLevelLabel");
+
+function computeAreaOneCreepers(b1, direction) {
+  const additions = AREA_ONE_CREEPER_ADDITIONS[direction.toLowerCase()];
+  if (!additions) return null;
+
+  const firstPart = AREA_ONE_BASE_FIRST_PART;
+  const added = additions[b1] ?? 0;
+  const secondPart = AREA_ONE_BASE_SECOND_PART + added;
+
+  return {
+    total: firstPart + secondPart,
+    firstPart,
+    secondPart,
+  };
+}
+
+function getCreeperCounts(directions, b1) {
+  const counts = [null, null, null, null];
+
+  const areaOneDirection = directions[0];
+  const areaOneDetails = computeAreaOneCreepers(b1, areaOneDirection);
+
+  if (areaOneDetails) {
+    counts[0] = {
+      ...areaOneDetails,
+      summary: `${areaOneDetails.total} creepers (3 + ${areaOneDetails.secondPart})`,
+    };
+  }
+
+  return counts;
+}
 
 function formatDirection(value, position) {
   if (position === "first") {
@@ -94,7 +133,7 @@ function directionClass(direction) {
   return directionClassMap[direction.toLowerCase()] ?? "";
 }
 
-function updateDirectionBadges(directions) {
+function updateDirectionBadges(directions, creeperCounts) {
   const labels = [
     { element: area1Direction, text: directions[0] },
     { element: area2Direction, text: directions[1] },
@@ -108,10 +147,10 @@ function updateDirectionBadges(directions) {
     element.classList.add(directionClass(text));
   });
 
-  updateGridHighlight(directions);
+  updateGridHighlight(directions, creeperCounts);
 }
 
-function updateGridHighlight(directions) {
+function updateGridHighlight(directions, creeperCounts) {
   gridCells.forEach((cell) => {
     cell.classList.remove(
       "active",
@@ -119,6 +158,8 @@ function updateGridHighlight(directions) {
       "direction-middle",
       "direction-right"
     );
+    cell.removeAttribute("data-creepers");
+    cell.classList.remove("has-creepers");
   });
 
   directions.forEach((dir, idx) => {
@@ -128,6 +169,11 @@ function updateGridHighlight(directions) {
     );
     if (target) {
       target.classList.add("active", directionClass(dir));
+      const creepers = creeperCounts?.[idx];
+      if (creepers?.summary) {
+        target.dataset.creepers = creepers.summary;
+        target.classList.add("has-creepers");
+      }
     }
   });
 }
@@ -211,7 +257,9 @@ function calculate() {
   updateCharacterLabel(characterName);
   persistEntry({ playerId, level, name: characterName });
 
-  updateDirectionBadges([first, second, third, fourth]);
+  const creeperCounts = getCreeperCounts([first, second, third, fourth], b1);
+
+  updateDirectionBadges([first, second, third, fourth], creeperCounts);
   updateLevelLabels(level);
 }
 
