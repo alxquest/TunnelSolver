@@ -17,7 +17,6 @@
             path using the C <code>srand</code>/<code>rand</code> sequence.
           </p>
         </div>
-        
       </div>
     </header>
 
@@ -26,13 +25,26 @@
         <h2>Inputs</h2>
         <form id="calculatorForm" class="form-grid">
           <label class="form-field">
-            <span>Character name (optional)</span>
-            <input
-              id="characterName"
-              name="characterName"
-              type="text"
-              autocomplete="name"
-            />
+            <span>Character name (save or load)</span>
+            <div class="character-input">
+              <input
+                id="characterName"
+                name="characterName"
+                type="text"
+                autocomplete="name"
+                list="characterOptions"
+                placeholder="Type a name or pick a saved one"
+              />
+              <datalist id="characterOptions"></datalist>
+              <button id="removeCharacter" type="button" class="ghost ghost--muted">
+                Remove
+              </button>
+            </div>
+            <p class="form-helper">
+              Choose a saved character to auto-fill ID and level. Calculating saves the
+              latest values for the typed name.
+            </p>
+            <p id="characterStatus" class="form-helper form-helper--status"></p>
           </label>
           <label class="form-field">
             <span>Character ID (see below)</span>
@@ -64,17 +76,17 @@
 
         <div class="seed-row">
           <div>
-            <p class="muted">Seed (ID × Level)</p>
-            <p id="seedValue" class="seed-value">—</p>
+            <p class="muted">Seed (ID x Level)</p>
+            <p id="seedValue" class="seed-value">--</p>
           </div>
           <div>
             <p class="muted">Character</p>
-            <p id="characterNameDisplay" class="seed-value seed-value--name">—</p>
+            <p id="characterNameDisplay" class="seed-value seed-value--name">--</p>
           </div>
           <div class="muted random-readout">
-            <div>b1 = <span id="b1Value">—</span></div>
-            <div>b2 = <span id="b2Value">—</span></div>
-            <div>c = <span id="cValue">—</span></div>
+            <div>b1 = <span id="b1Value">--</span></div>
+            <div>b2 = <span id="b2Value">--</span></div>
+            <div>c = <span id="cValue">--</span></div>
           </div>
         </div>
 
@@ -83,19 +95,19 @@
           <ul id="directionList" class="direction-list">
             <li>
               <span class="label">1st area</span>
-              <span id="area1Direction" class="direction direction-pill">—</span>
+              <span id="area1Direction" class="direction direction-pill">--</span>
             </li>
             <li>
               <span class="label">2nd area</span>
-              <span id="area2Direction" class="direction direction-pill">—</span>
+              <span id="area2Direction" class="direction direction-pill">--</span>
             </li>
             <li>
               <span class="label">3rd area</span>
-              <span id="area3Direction" class="direction direction-pill">—</span>
+              <span id="area3Direction" class="direction direction-pill">--</span>
             </li>
             <li>
               <span class="label">4th area</span>
-              <span id="area4Direction" class="direction direction-pill">—</span>
+              <span id="area4Direction" class="direction direction-pill">--</span>
             </li>
           </ul>
         </div>
@@ -125,13 +137,13 @@
           <h2>Map</h2>
           <div class="level-nav">
             <button id="prevLevel" type="button" class="ghost">
-              ↝ <span id="prevLevelLabel">—</span>
+              <span class="nav-label">Prev</span> <span id="prevLevelLabel">--</span>
             </button>
             <div class="current-level">
-              Level <span id="currentLevelLabel">—</span>
+              Level <span id="currentLevelLabel">--</span>
             </div>
             <button id="nextLevel" type="button" class="ghost">
-              <span id="nextLevelLabel">—</span> →
+              <span id="nextLevelLabel">--</span> <span class="nav-label">Next</span>
             </button>
           </div>
         </div>
