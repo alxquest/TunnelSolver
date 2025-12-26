@@ -1,17 +1,37 @@
 class CRand {
   constructor(seed) {
-    // Use BigInt to mirror the 31-bit LCG math used by C's rand()
-    this.state = BigInt.asUintN(32, BigInt(seed));
+    // Mirror glibc's random()/rand() additive generator (mod-less update, Knuth TAOCP 3.2.2)
+    this.MOD = 2147483647n; // 2^31 - 1
+    this.DEG = 31;
+    this.SEP = 3;
+
+    const sanitized = BigInt(seed) % this.MOD || 1n; // glibc treats seed 0 as 1
+    this.state = new Array(this.DEG).fill(0n);
+    this.state[0] = sanitized;
+
+    for (let i = 1; i < this.DEG; i += 1) {
+      // Park–Miller minimal standard to seed the table
+      this.state[i] = (16807n * this.state[i - 1]) % this.MOD;
+    }
+
+    this.fptr = this.SEP;
+    this.rptr = 0;
+
+    // Warm up like glibc: run 10 * DEG iterations
+    for (let i = 0; i < 10 * this.DEG; i += 1) {
+      this.rand();
+    }
   }
 
   rand() {
-    // ANSI C style LCG: (state * 1103515245 + 12345) mod 2^31
-    const a = 1103515245n;
-    const c = 12345n;
-    const m = 2147483648n; // 2^31
+    // Additive feedback: state[fptr] += state[rptr] (no modulus), mask to 31 bits on output
+    this.state[this.fptr] = this.state[this.fptr] + this.state[this.rptr];
+    const result = Number((this.state[this.fptr] >> 1n) & 0x7fffffffn);
 
-    this.state = (this.state * a + c) % m;
-    return Number((this.state / 65536n) % 32768n); // (state >> 16) & 0x7fff
+    this.fptr = (this.fptr + 1) % this.DEG;
+    this.rptr = (this.rptr + 1) % this.DEG;
+
+    return result;
   }
 }
 
