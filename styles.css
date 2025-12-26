@@ -215,6 +215,10 @@ button:disabled {
   overflow: hidden;
 }
 
+.how-to__figure--compact {
+  max-width: 480px;
+}
+
 .how-to__figure img {
   display: block;
   width: 100%;
@@ -383,6 +387,51 @@ button:disabled {
 .tunnel-grid .cell.active.direction-right {
   background: rgba(228, 118, 255, 0.14);
   box-shadow: inset 0 0 0 2px rgba(228, 118, 255, 0.85), 0 10px 22px rgba(228, 118, 255, 0.25);
+}
+
+.tunnel-grid .cell.has-creepers::before {
+  content: attr(data-creepers);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%) translateY(0);
+  background: rgba(15, 17, 21, 0.95);
+  color: #e9eef7;
+  border: 1px solid #1f2634;
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.tunnel-grid .cell.has-creepers::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%) translateY(0) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: rgba(15, 17, 21, 0.95);
+  border-left: 1px solid #1f2634;
+  border-top: 1px solid #1f2634;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.tunnel-grid .cell.has-creepers:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.tunnel-grid .cell.has-creepers:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-2px) rotate(45deg);
 }
 
 .map-hint {
