@@ -8,7 +8,7 @@ class CRand {
     this.state = new Array(LEN).fill(0n);
     const sanitizedSeed = BigInt(seed) % MOD31 || 1n; // glibc treats seed 0 as 1
 
-    // Park–Miller to initialize r[0..30]
+    // Park-Miller to initialize r[0..30]
     this.state[0] = sanitizedSeed;
     for (let i = 1; i < DEG; i += 1) {
       this.state[i] = (16807n * this.state[i - 1]) % MOD31;
@@ -53,12 +53,15 @@ const AREA_ONE_CREEPER_ADDITIONS = {
 };
 
 const STORAGE_KEY = "tunnelCalculator.lastEntry";
+const CHARACTER_LIST_KEY = "tunnelCalculator.characters";
 
 const form = document.getElementById("calculatorForm");
 const characterNameInput = document.getElementById("characterName");
+const characterOptions = document.getElementById("characterOptions");
 const playerIdInput = document.getElementById("playerId");
 const tunnelLevelInput = document.getElementById("tunnelLevel");
 const errorMessage = document.getElementById("errorMessage");
+const characterStatus = document.getElementById("characterStatus");
 const seedValue = document.getElementById("seedValue");
 const characterNameDisplay = document.getElementById("characterNameDisplay");
 const b1Value = document.getElementById("b1Value");
@@ -74,6 +77,9 @@ const nextLevelBtn = document.getElementById("nextLevel");
 const prevLevelLabel = document.getElementById("prevLevelLabel");
 const nextLevelLabel = document.getElementById("nextLevelLabel");
 const currentLevelLabel = document.getElementById("currentLevelLabel");
+const removeCharacterBtn = document.getElementById("removeCharacter");
+
+let storedCharacters = loadStoredCharacters();
 
 function computeAreaOneCreepers(b1, direction) {
   const additions = AREA_ONE_CREEPER_ADDITIONS[direction.toLowerCase()];
@@ -194,6 +200,38 @@ function validateInputs() {
   return { playerId, level, characterName };
 }
 
+function loadStoredCharacters() {
+  try {
+    const raw = localStorage.getItem(CHARACTER_LIST_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((entry) => ({
+        name: typeof entry.name === "string" ? entry.name.trim() : "",
+        playerId: Number(entry.playerId),
+        level: Number(entry.level),
+      }))
+      .filter(
+        (entry) =>
+          entry.name &&
+          Number.isInteger(entry.playerId) &&
+          Number.isInteger(entry.level)
+      );
+  } catch (err) {
+    console.warn("Unable to read saved characters", err);
+    return [];
+  }
+}
+
+function saveStoredCharacters(characters) {
+  try {
+    localStorage.setItem(CHARACTER_LIST_KEY, JSON.stringify(characters));
+  } catch (err) {
+    console.warn("Unable to save characters", err);
+  }
+}
+
 function loadLastEntry() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -221,8 +259,106 @@ function persistEntry(entry) {
 }
 
 function updateCharacterLabel(name) {
-  const displayName = name && name.trim() ? name.trim() : "—";
+  const displayName = name && name.trim() ? name.trim() : "--";
   characterNameDisplay.textContent = displayName;
+}
+
+function namesMatch(a, b) {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+function findStoredCharacter(name) {
+  return storedCharacters.find((entry) => namesMatch(entry.name, name));
+}
+
+function refreshCharacterOptions(selectedName = "") {
+  while (characterOptions.firstChild) {
+    characterOptions.removeChild(characterOptions.firstChild);
+  }
+
+  const sorted = [...storedCharacters].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  sorted.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.name;
+    option.dataset.playerId = `${entry.playerId}`;
+    option.dataset.level = `${entry.level}`;
+    characterOptions.appendChild(option);
+  });
+
+  if (selectedName) {
+    const matching = sorted.find((entry) => namesMatch(entry.name, selectedName));
+    if (matching) {
+      characterNameInput.value = matching.name;
+    }
+  }
+}
+
+function saveCharacter(entry) {
+  const name = entry.name?.trim();
+  if (!name) return;
+
+  const existingIndex = storedCharacters.findIndex((item) => namesMatch(item.name, name));
+  const normalized = {
+    name,
+    playerId: entry.playerId,
+    level: entry.level,
+  };
+
+  if (existingIndex >= 0) {
+    storedCharacters[existingIndex] = normalized;
+  } else {
+    storedCharacters.push(normalized);
+  }
+
+  saveStoredCharacters(storedCharacters);
+  refreshCharacterOptions(name);
+}
+
+function showStatus(message = "") {
+  characterStatus.textContent = message;
+}
+
+function loadCharacterFromInput() {
+  const name = characterNameInput.value.trim();
+  if (!name) {
+    showStatus("");
+    return;
+  }
+
+  const match = findStoredCharacter(name);
+  if (!match) {
+    showStatus("No saved data for that character yet.");
+    return;
+  }
+
+  playerIdInput.value = match.playerId;
+  tunnelLevelInput.value = match.level;
+  updateCharacterLabel(match.name);
+  showStatus("Loaded saved character.");
+  calculate();
+}
+
+function removeCharacter() {
+  const name = characterNameInput.value.trim();
+  if (!name) {
+    showStatus("Enter a name to remove it from saved characters.");
+    return;
+  }
+
+  const before = storedCharacters.length;
+  storedCharacters = storedCharacters.filter((entry) => !namesMatch(entry.name, name));
+
+  if (storedCharacters.length === before) {
+    showStatus("No saved character matched that name.");
+    return;
+  }
+
+  saveStoredCharacters(storedCharacters);
+  refreshCharacterOptions();
+  showStatus("Removed saved character.");
 }
 
 function calculate() {
@@ -256,6 +392,12 @@ function calculate() {
   cValue.textContent = `${c}`;
   updateCharacterLabel(characterName);
   persistEntry({ playerId, level, name: characterName });
+  if (characterName.trim()) {
+    saveCharacter({ playerId, level, name: characterName });
+    showStatus("Saved character entry.");
+  } else {
+    showStatus("");
+  }
 
   const creeperCounts = getCreeperCounts([first, second, third, fourth], b1);
 
@@ -287,9 +429,14 @@ form.addEventListener("submit", (event) => {
 
 prevLevelBtn.addEventListener("click", () => nudgeLevel(-1));
 nextLevelBtn.addEventListener("click", () => nudgeLevel(1));
+characterNameInput.addEventListener("change", loadCharacterFromInput);
+characterNameInput.addEventListener("blur", loadCharacterFromInput);
+removeCharacterBtn.addEventListener("click", removeCharacter);
 
+refreshCharacterOptions();
 const saved = loadLastEntry();
-playerIdInput.value = saved?.playerId ?? 57;
-tunnelLevelInput.value = saved?.level ?? 10;
-characterNameInput.value = saved?.name ?? "";
+const savedCharacter = saved?.name ? findStoredCharacter(saved.name) : null;
+playerIdInput.value = savedCharacter?.playerId ?? saved?.playerId ?? 57;
+tunnelLevelInput.value = savedCharacter?.level ?? saved?.level ?? 10;
+characterNameInput.value = savedCharacter?.name ?? saved?.name ?? "";
 calculate();

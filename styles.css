@@ -104,6 +104,16 @@ h1 {
   color: #cdd5e3;
 }
 
+.character-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.character-input input {
+  flex: 1;
+}
+
 input {
   appearance: none;
   border: 1px solid #222a36;
@@ -137,6 +147,13 @@ button:active {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.ghost--muted {
+  background: #0f1115;
+  border-color: #1f2634;
+  color: #cdd5e3;
+  padding: 10px 12px;
 }
 
 .primary {
@@ -189,6 +206,17 @@ button:disabled {
   gap: 16px;
   flex-wrap: wrap;
   align-items: center;
+}
+
+.form-helper {
+  margin: 4px 0 0;
+  color: #a7afbf;
+  font-size: 13px;
+}
+
+.form-helper--status {
+  min-height: 18px;
+  font-weight: 600;
 }
 
 .summary {
@@ -432,6 +460,11 @@ button:disabled {
 .tunnel-grid .cell.has-creepers:hover::after {
   opacity: 1;
   transform: translateX(-50%) translateY(-2px) rotate(45deg);
+}
+
+.nav-label {
+  font-size: 12px;
+  color: #cdd5e3;
 }
 
 .map-hint {
