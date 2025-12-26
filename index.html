@@ -105,37 +105,37 @@
         </div>
 
         <div class="map-wrap">
-          <div class="map-frame">
-            <img
-              id="tunnelMap"
-              src="assets/tunnel-map.svg"
-              alt="Tunneling area map"
-              loading="lazy"
-            />
-            <div class="gradient-mask"></div>
-          </div>
-          <div class="path-overlay" aria-hidden="true">
-            <div class="node node-1">
-              <p>Area 1</p>
-              <span class="direction direction-pill">—</span>
+          <div class="tunnel-graphic" aria-label="Tunnel path grid">
+            <div class="tunnel-legend">
+              <span>Left</span><span>Middle</span><span>Right</span>
             </div>
-            <div class="node node-2">
-              <p>Area 2</p>
-              <span class="direction direction-pill">—</span>
-            </div>
-            <div class="node node-3">
-              <p>Area 3</p>
-              <span class="direction direction-pill">—</span>
-            </div>
-            <div class="node node-4">
-              <p>Area 4</p>
-              <span class="direction direction-pill">—</span>
+            <div class="tunnel-grid">
+              <div class="row-label">Area 1</div>
+              <div class="cell" data-area="1" data-direction="left"></div>
+              <div class="cell" data-area="1" data-direction="middle"></div>
+              <div class="cell" data-area="1" data-direction="right"></div>
+
+              <div class="row-label">Area 2</div>
+              <div class="cell" data-area="2" data-direction="left"></div>
+              <div class="cell" data-area="2" data-direction="middle"></div>
+              <div class="cell" data-area="2" data-direction="right"></div>
+
+              <div class="row-label">Area 3</div>
+              <div class="cell" data-area="3" data-direction="left"></div>
+              <div class="cell" data-area="3" data-direction="middle"></div>
+              <div class="cell" data-area="3" data-direction="right"></div>
+
+              <div class="row-label">Area 4</div>
+              <div class="cell" data-area="4" data-direction="left"></div>
+              <div class="cell" data-area="4" data-direction="middle"></div>
+              <div class="cell" data-area="4" data-direction="right"></div>
             </div>
           </div>
         </div>
         <p class="map-hint">
-          Directions are highlighted on the cropped, rotated tunnel map. Use the
-          arrows above to jump to adjacent levels and recalculate instantly.
+          Directions light up the 4×3 tunnel grid (4 areas tall, 3 lanes wide).
+          Use the arrows above to jump to adjacent levels and recalculate
+          instantly.
         </p>
       </section>
     </main>

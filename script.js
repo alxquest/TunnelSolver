@@ -56,29 +56,24 @@ const area1Direction = document.getElementById("area1Direction");
 const area2Direction = document.getElementById("area2Direction");
 const area3Direction = document.getElementById("area3Direction");
 const area4Direction = document.getElementById("area4Direction");
-const overlayNodes = document.querySelectorAll(".path-overlay .node");
+const gridCells = document.querySelectorAll(".tunnel-grid .cell");
 const prevLevelBtn = document.getElementById("prevLevel");
 const nextLevelBtn = document.getElementById("nextLevel");
 const prevLevelLabel = document.getElementById("prevLevelLabel");
 const nextLevelLabel = document.getElementById("nextLevelLabel");
 const currentLevelLabel = document.getElementById("currentLevelLabel");
 
-function normalizeCValue(rawC) {
-  // Map rand() % 3 (0,1,2) to 1..3 so we can surface "3" as described.
-  return rawC === 0 ? 3 : rawC;
-}
-
 function formatDirection(value, position) {
   if (position === "first") {
-    if (value === 2) return "Left";
-    if (value === 1) return "Middle";
-    return "Right";
+    if (value === 1) return "Left";
+    if (value === 0) return "Middle";
+    return "Right"; // value === 2
   }
 
   if (position === "third") {
-    if (value === 3) return "Left";
-    if (value === 1) return "Middle";
-    return "Right";
+    if (value === 2) return "Left";
+    if (value === 0) return "Middle";
+    return "Right"; // value === 1
   }
 
   if (position === "fourth") {
@@ -109,12 +104,27 @@ function updateDirectionBadges(directions) {
     element.classList.add(directionClass(text));
   });
 
-  overlayNodes.forEach((node, index) => {
-    const badge = node.querySelector(".direction-pill");
-    if (!badge) return;
-    badge.textContent = directions[index];
-    badge.classList.remove("direction-left", "direction-middle", "direction-right");
-    badge.classList.add(directionClass(directions[index]));
+  updateGridHighlight(directions);
+}
+
+function updateGridHighlight(directions) {
+  gridCells.forEach((cell) => {
+    cell.classList.remove(
+      "active",
+      "direction-left",
+      "direction-middle",
+      "direction-right"
+    );
+  });
+
+  directions.forEach((dir, idx) => {
+    const area = idx + 1;
+    const target = document.querySelector(
+      `.tunnel-grid .cell[data-area="${area}"][data-direction="${dir.toLowerCase()}"]`
+    );
+    if (target) {
+      target.classList.add("active", directionClass(dir));
+    }
   });
 }
 
@@ -150,7 +160,7 @@ function calculate() {
   const b1 = rng.rand() % 3;
   const b2 = rng.rand() % 2;
   const cRaw = rng.rand() % 3;
-  const c = normalizeCValue(cRaw);
+  const c = cRaw;
 
   const first = formatDirection(c, "first");
   const second = formatDirection(b1, "second");
