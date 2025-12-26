@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="405" height="70" viewBox="0 0 405 70" role="img" aria-labelledby="title desc">
+  <title id="title">/playerkiller prompt showing confirmation number</title>
+  <desc id="desc">The Astonia /playerkiller prompt demonstrating where to read the character ID.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a181d"/>
+      <stop offset="100%" stop-color="#0f0d12"/>
+    </linearGradient>
+  </defs>
+  <rect width="405" height="70" fill="url(#bg)" rx="4" />
+  <g font-family="\"Lucida Console\", Monaco, monospace" font-size="12" letter-spacing="-0.2">
+    <text x="8" y="18" fill="#f7d88a">Please take a moment to consider this decision. If another player kills you, he will be able to take all</text>
+    <text x="8" y="32" fill="#f7d88a">your belongings, or kill you over and over again. Do you really want this?</text>
+    <text x="8" y="46" fill="#f7d88a">Type '<tspan fill="#f4b860">/iwilldie 876</tspan>' to confirm.</text>
+    <text x="8" y="60" fill="#c7ccd9">PK is off.</text>
+  </g>
+</svg>
