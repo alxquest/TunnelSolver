@@ -17,7 +17,7 @@
             path using the C <code>srand</code>/<code>rand</code> sequence.
           </p>
         </div>
-        <div class="pill">github.io ready</div>
+        
       </div>
     </header>
 
@@ -36,7 +36,7 @@
             />
           </label>
           <label class="form-field">
-            <span>Player ID</span>
+            <span>Character ID (see below)</span>
             <input
               id="playerId"
               name="playerId"
@@ -130,7 +130,7 @@
           <h2>Map</h2>
           <div class="level-nav">
             <button id="prevLevel" type="button" class="ghost">
-              ← <span id="prevLevelLabel">—</span>
+              ↝ <span id="prevLevelLabel">—</span>
             </button>
             <div class="current-level">
               Level <span id="currentLevelLabel">—</span>
@@ -170,7 +170,7 @@
           </div>
         </div>
         <p class="map-hint">
-          Directions light up the 4×3 tunnel grid (4 areas tall, 3 lanes wide).
+          Directions light up the 4x3 tunnel grid (4 areas tall, 3 lanes wide).
           Areas now run bottom-to-top (Area 1 on the bottom row, Area 4 on the
           top). Hover the highlighted box to see creepers per area (Area 1 is split:
           3 in the first half, and at least 2 plus lane-based additions in the second
@@ -181,10 +181,7 @@
 
     <footer class="footer">
       <p>
-        Recreates the Astonia 3 tunnel path logic:
-        <code>b1 = rand() % 3</code>, <code>b2 = rand() % 2</code>,
-        <code>c = rand() % 3</code> after seeding
-        <code>srand(playerId × level)</code>.
+        
       </p>
     </footer>
 

@@ -290,6 +290,6 @@ nextLevelBtn.addEventListener("click", () => nudgeLevel(1));
 
 const saved = loadLastEntry();
 playerIdInput.value = saved?.playerId ?? 57;
-tunnelLevelInput.value = saved?.level ?? 57;
+tunnelLevelInput.value = saved?.level ?? 10;
 characterNameInput.value = saved?.name ?? "";
 calculate();
