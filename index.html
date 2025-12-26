@@ -53,20 +53,42 @@
               name="playerId"
               type="number"
               min="0"
+              class="no-spinner"
               placeholder="e.g. 57"
               required
             />
           </label>
           <label class="form-field">
             <span>Tunnel level</span>
-            <input
-              id="tunnelLevel"
-              name="tunnelLevel"
-              type="number"
-              min="1"
-              placeholder="e.g. 57"
-              required
-            />
+            <div class="level-stepper">
+              <button
+                id="tunnelLevelDecrease"
+                class="ghost ghost--muted stepper-btn"
+                type="button"
+                aria-label="Decrease tunnel level"
+              >
+                &minus;
+              </button>
+              <input
+                id="tunnelLevel"
+                name="tunnelLevel"
+                type="number"
+                min="10"
+                max="200"
+                class="no-spinner"
+                placeholder="e.g. 57"
+                required
+                inputmode="numeric"
+              />
+              <button
+                id="tunnelLevelIncrease"
+                class="ghost ghost--muted stepper-btn"
+                type="button"
+                aria-label="Increase tunnel level"
+              >
+                +
+              </button>
+            </div>
           </label>
           <button id="calculateBtn" class="primary" type="submit">
             Calculate
@@ -150,13 +172,15 @@
           <h2>Map</h2>
           <div class="level-nav">
             <button id="prevLevel" type="button" class="ghost">
-              <span class="nav-label">Prev</span> <span id="prevLevelLabel">--</span>
+              <span class="nav-icon" aria-hidden="true">&#8592;</span>
+              <span id="prevLevelLabel">--</span>
             </button>
             <div class="current-level">
               Level <span id="currentLevelLabel">--</span>
             </div>
             <button id="nextLevel" type="button" class="ghost">
-              <span id="nextLevelLabel">--</span> <span class="nav-label">Next</span>
+              <span id="nextLevelLabel">--</span>
+              <span class="nav-icon" aria-hidden="true">&#8594;</span>
             </button>
           </div>
         </div>

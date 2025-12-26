@@ -44,6 +44,9 @@ const directionClassMap = {
   right: "direction-right",
 };
 
+const TUNNEL_MIN_LEVEL = 10;
+const TUNNEL_MAX_LEVEL = 200;
+
 const AREA_ONE_BASE_FIRST_PART = 3;
 const AREA_ONE_BASE_SECOND_PART = 2;
 const AREA_ONE_CREEPER_ADDITIONS = {
@@ -77,6 +80,8 @@ const nextLevelBtn = document.getElementById("nextLevel");
 const prevLevelLabel = document.getElementById("prevLevelLabel");
 const nextLevelLabel = document.getElementById("nextLevelLabel");
 const currentLevelLabel = document.getElementById("currentLevelLabel");
+const levelDecreaseBtn = document.getElementById("tunnelLevelDecrease");
+const levelIncreaseBtn = document.getElementById("tunnelLevelIncrease");
 const removeCharacterBtn = document.getElementById("removeCharacter");
 const savedCharactersList = document.getElementById("savedCharactersList");
 
@@ -179,6 +184,13 @@ function updateGridHighlight(directions, creeperCounts) {
   });
 }
 
+function clampLevel(level) {
+  const numeric = Number(level);
+  if (!Number.isFinite(numeric)) return TUNNEL_MIN_LEVEL;
+  const integerLevel = Math.trunc(numeric);
+  return Math.min(Math.max(integerLevel, TUNNEL_MIN_LEVEL), TUNNEL_MAX_LEVEL);
+}
+
 function validateInputs() {
   const playerId = Number(playerIdInput.value);
   const level = Number(tunnelLevelInput.value);
@@ -188,8 +200,10 @@ function validateInputs() {
     throw new Error("Player ID must be a non-negative integer.");
   }
 
-  if (!Number.isInteger(level) || level < 1) {
-    throw new Error("Tunnel level must be at least 1.");
+  if (!Number.isInteger(level) || level < TUNNEL_MIN_LEVEL || level > TUNNEL_MAX_LEVEL) {
+    throw new Error(
+      `Tunnel level must be between ${TUNNEL_MIN_LEVEL} and ${TUNNEL_MAX_LEVEL}.`
+    );
   }
 
   return { playerId, level, characterName };
@@ -388,10 +402,16 @@ function loadCharacterFromInput() {
 
 function loadCharacterEntry(entry) {
   playerIdInput.value = entry.playerId;
-  tunnelLevelInput.value = entry.level;
+  const clampedLevel = clampLevel(entry.level);
+  tunnelLevelInput.value = clampedLevel;
   characterNameInput.value = entry.name;
   updateCharacterLabel(entry.name);
-  showStatus("Loaded saved character.");
+  const adjusted = clampedLevel !== entry.level;
+  showStatus(
+    adjusted
+      ? `Loaded saved character (level adjusted to ${TUNNEL_MIN_LEVEL}-${TUNNEL_MAX_LEVEL}).`
+      : "Loaded saved character."
+  );
   refreshCharacterOptions(entry.name);
   calculate();
 }
@@ -464,16 +484,24 @@ function calculate() {
 function updateLevelLabels(level) {
   currentLevelLabel.textContent = level;
 
-  const prevLevel = Math.max(level - 1, 1);
-  const nextLevel = level + 1;
+  const prevLevel = Math.max(level - 1, TUNNEL_MIN_LEVEL);
+  const nextLevel = Math.min(level + 1, TUNNEL_MAX_LEVEL);
 
   prevLevelLabel.textContent = prevLevel;
   nextLevelLabel.textContent = nextLevel;
+
+  const isAtMin = level <= TUNNEL_MIN_LEVEL;
+  const isAtMax = level >= TUNNEL_MAX_LEVEL;
+
+  prevLevelBtn.disabled = isAtMin;
+  nextLevelBtn.disabled = isAtMax;
+  if (levelDecreaseBtn) levelDecreaseBtn.disabled = isAtMin;
+  if (levelIncreaseBtn) levelIncreaseBtn.disabled = isAtMax;
 }
 
 function nudgeLevel(delta) {
-  const current = Number(tunnelLevelInput.value) || 1;
-  const nextLevel = Math.max(current + delta, 1);
+  const current = clampLevel(tunnelLevelInput.value);
+  const nextLevel = clampLevel(current + delta);
   tunnelLevelInput.value = nextLevel;
   calculate();
 }
@@ -485,6 +513,8 @@ form.addEventListener("submit", (event) => {
 
 prevLevelBtn.addEventListener("click", () => nudgeLevel(-1));
 nextLevelBtn.addEventListener("click", () => nudgeLevel(1));
+levelDecreaseBtn?.addEventListener("click", () => nudgeLevel(-1));
+levelIncreaseBtn?.addEventListener("click", () => nudgeLevel(1));
 characterNameInput.addEventListener("input", loadCharacterFromInput);
 characterNameInput.addEventListener("change", loadCharacterFromInput);
 characterNameInput.addEventListener("blur", loadCharacterFromInput);
@@ -507,7 +537,9 @@ refreshCharacterOptions();
 const saved = loadLastEntry();
 const savedCharacter = saved?.name ? findStoredCharacter(saved.name) : null;
 playerIdInput.value = savedCharacter?.playerId ?? saved?.playerId ?? 57;
-tunnelLevelInput.value = savedCharacter?.level ?? saved?.level ?? 10;
+const initialLevel =
+  clampLevel(savedCharacter?.level ?? saved?.level ?? TUNNEL_MIN_LEVEL);
+tunnelLevelInput.value = initialLevel;
 characterNameInput.value = savedCharacter?.name ?? saved?.name ?? "";
 renderSavedCharacters(characterNameInput.value);
 calculate();
