@@ -78,6 +78,7 @@ const prevLevelLabel = document.getElementById("prevLevelLabel");
 const nextLevelLabel = document.getElementById("nextLevelLabel");
 const currentLevelLabel = document.getElementById("currentLevelLabel");
 const removeCharacterBtn = document.getElementById("removeCharacter");
+const savedCharactersList = document.getElementById("savedCharactersList");
 
 let storedCharacters = loadStoredCharacters();
 
@@ -294,6 +295,8 @@ function refreshCharacterOptions(selectedName = "") {
       characterNameInput.value = matching.name;
     }
   }
+
+  renderSavedCharacters(selectedName);
 }
 
 function saveCharacter(entry) {
@@ -317,6 +320,58 @@ function saveCharacter(entry) {
   refreshCharacterOptions(name);
 }
 
+function renderSavedCharacters(selectedName = "") {
+  if (!savedCharactersList) return;
+
+  while (savedCharactersList.firstChild) {
+    savedCharactersList.removeChild(savedCharactersList.firstChild);
+  }
+
+  if (!storedCharacters.length) {
+    const empty = document.createElement("p");
+    empty.className = "muted saved-list__empty";
+    empty.textContent = "No saved characters yet.";
+    savedCharactersList.appendChild(empty);
+    return;
+  }
+
+  const sorted = [...storedCharacters].sort((a, b) => a.name.localeCompare(b.name));
+  const list = document.createElement("ul");
+  list.className = "saved-list";
+
+  sorted.forEach((entry) => {
+    const item = document.createElement("li");
+    item.className = "saved-list__item";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ghost saved-list__load";
+    button.dataset.name = entry.name;
+    button.dataset.playerId = `${entry.playerId}`;
+    button.dataset.level = `${entry.level}`;
+
+    const nameLabel = document.createElement("div");
+    nameLabel.className = "saved-list__name";
+    nameLabel.textContent = entry.name;
+
+    const meta = document.createElement("div");
+    meta.className = "saved-list__meta";
+    meta.textContent = `ID ${entry.playerId} • Level ${entry.level}`;
+
+    button.appendChild(nameLabel);
+    button.appendChild(meta);
+
+    if (selectedName && namesMatch(entry.name, selectedName)) {
+      button.classList.add("is-selected");
+    }
+
+    item.appendChild(button);
+    list.appendChild(item);
+  });
+
+  savedCharactersList.appendChild(list);
+}
+
 function showStatus(message = "") {
   characterStatus.textContent = message;
 }
@@ -334,10 +389,16 @@ function loadCharacterFromInput() {
     return;
   }
 
-  playerIdInput.value = match.playerId;
-  tunnelLevelInput.value = match.level;
-  updateCharacterLabel(match.name);
+  loadCharacterEntry(match);
+}
+
+function loadCharacterEntry(entry) {
+  playerIdInput.value = entry.playerId;
+  tunnelLevelInput.value = entry.level;
+  characterNameInput.value = entry.name;
+  updateCharacterLabel(entry.name);
   showStatus("Loaded saved character.");
+  refreshCharacterOptions(entry.name);
   calculate();
 }
 
@@ -358,6 +419,7 @@ function removeCharacter() {
 
   saveStoredCharacters(storedCharacters);
   refreshCharacterOptions();
+  renderSavedCharacters();
   showStatus("Removed saved character.");
 }
 
@@ -432,6 +494,19 @@ nextLevelBtn.addEventListener("click", () => nudgeLevel(1));
 characterNameInput.addEventListener("change", loadCharacterFromInput);
 characterNameInput.addEventListener("blur", loadCharacterFromInput);
 removeCharacterBtn.addEventListener("click", removeCharacter);
+savedCharactersList?.addEventListener("click", (event) => {
+  const target = event.target.closest("button[data-name]");
+  if (!target) return;
+
+  const entry = {
+    name: target.dataset.name ?? "",
+    playerId: Number(target.dataset.playerId),
+    level: Number(target.dataset.level),
+  };
+
+  if (!entry.name || Number.isNaN(entry.playerId) || Number.isNaN(entry.level)) return;
+  loadCharacterEntry(entry);
+});
 
 refreshCharacterOptions();
 const saved = loadLastEntry();
@@ -439,4 +514,5 @@ const savedCharacter = saved?.name ? findStoredCharacter(saved.name) : null;
 playerIdInput.value = savedCharacter?.playerId ?? saved?.playerId ?? 57;
 tunnelLevelInput.value = savedCharacter?.level ?? saved?.level ?? 10;
 characterNameInput.value = savedCharacter?.name ?? saved?.name ?? "";
+renderSavedCharacters(characterNameInput.value);
 calculate();
