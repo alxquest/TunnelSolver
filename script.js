@@ -166,7 +166,6 @@ function updateGridHighlight(directions, creeperCounts) {
       "direction-right"
     );
     cell.removeAttribute("data-creepers");
-    cell.classList.remove("has-creepers");
   });
 
   directions.forEach((dir, idx) => {
@@ -176,11 +175,6 @@ function updateGridHighlight(directions, creeperCounts) {
     );
     if (target) {
       target.classList.add("active", directionClass(dir));
-      const creepers = creeperCounts?.[idx];
-      if (creepers?.summary) {
-        target.dataset.creepers = creepers.summary;
-        target.classList.add("has-creepers");
-      }
     }
   });
 }
@@ -491,6 +485,7 @@ form.addEventListener("submit", (event) => {
 
 prevLevelBtn.addEventListener("click", () => nudgeLevel(-1));
 nextLevelBtn.addEventListener("click", () => nudgeLevel(1));
+characterNameInput.addEventListener("input", loadCharacterFromInput);
 characterNameInput.addEventListener("change", loadCharacterFromInput);
 characterNameInput.addEventListener("blur", loadCharacterFromInput);
 removeCharacterBtn.addEventListener("click", removeCharacter);
