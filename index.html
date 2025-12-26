@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Astonia 3 Tunnel Path Calculator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div class="header-content">
+        <div>
+          <p class="eyebrow">Astonia 3 helper</p>
+          <h1>Tunnel Path Calculator</h1>
+          <p class="lede">
+            Enter a player ID and tunnel level to reproduce the in-game tunnel
+            path using the C <code>srand</code>/<code>rand</code> sequence.
+          </p>
+        </div>
+        <div class="pill">github.io ready</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel controls">
+        <h2>Inputs</h2>
+        <form id="calculatorForm" class="form-grid">
+          <label class="form-field">
+            <span>Player ID</span>
+            <input
+              id="playerId"
+              name="playerId"
+              type="number"
+              min="0"
+              placeholder="e.g. 57"
+              required
+            />
+          </label>
+          <label class="form-field">
+            <span>Tunnel level</span>
+            <input
+              id="tunnelLevel"
+              name="tunnelLevel"
+              type="number"
+              min="1"
+              placeholder="e.g. 57"
+              required
+            />
+          </label>
+          <button id="calculateBtn" class="primary" type="submit">
+            Calculate
+          </button>
+          <p id="errorMessage" class="form-error" role="status"></p>
+        </form>
+
+        <div class="seed-row">
+          <div>
+            <p class="muted">Seed (ID × Level)</p>
+            <p id="seedValue" class="seed-value">—</p>
+          </div>
+          <div class="muted random-readout">
+            <div>b1 = <span id="b1Value">—</span></div>
+            <div>b2 = <span id="b2Value">—</span></div>
+            <div>c = <span id="cValue">—</span></div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <h3>Directions</h3>
+          <ul id="directionList" class="direction-list">
+            <li>
+              <span class="label">1st area</span>
+              <span id="area1Direction" class="direction direction-pill">—</span>
+            </li>
+            <li>
+              <span class="label">2nd area</span>
+              <span id="area2Direction" class="direction direction-pill">—</span>
+            </li>
+            <li>
+              <span class="label">3rd area</span>
+              <span id="area3Direction" class="direction direction-pill">—</span>
+            </li>
+            <li>
+              <span class="label">4th area</span>
+              <span id="area4Direction" class="direction direction-pill">—</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel map-panel">
+        <div class="map-header">
+          <h2>Map</h2>
+          <div class="level-nav">
+            <button id="prevLevel" type="button" class="ghost">
+              ← <span id="prevLevelLabel">—</span>
+            </button>
+            <div class="current-level">
+              Level <span id="currentLevelLabel">—</span>
+            </div>
+            <button id="nextLevel" type="button" class="ghost">
+              <span id="nextLevelLabel">—</span> →
+            </button>
+          </div>
+        </div>
+
+        <div class="map-wrap">
+          <div class="tunnel-graphic" aria-label="Tunnel path grid">
+            <div class="tunnel-legend">
+              <span>Left</span><span>Middle</span><span>Right</span>
+            </div>
+            <div class="tunnel-grid">
+              <div class="row-label">Area 1</div>
+              <div class="cell" data-area="1" data-direction="left"></div>
+              <div class="cell" data-area="1" data-direction="middle"></div>
+              <div class="cell" data-area="1" data-direction="right"></div>
+
+              <div class="row-label">Area 2</div>
+              <div class="cell" data-area="2" data-direction="left"></div>
+              <div class="cell" data-area="2" data-direction="middle"></div>
+              <div class="cell" data-area="2" data-direction="right"></div>
+
+              <div class="row-label">Area 3</div>
+              <div class="cell" data-area="3" data-direction="left"></div>
+              <div class="cell" data-area="3" data-direction="middle"></div>
+              <div class="cell" data-area="3" data-direction="right"></div>
+
+              <div class="row-label">Area 4</div>
+              <div class="cell" data-area="4" data-direction="left"></div>
+              <div class="cell" data-area="4" data-direction="middle"></div>
+              <div class="cell" data-area="4" data-direction="right"></div>
+            </div>
+          </div>
+        </div>
+        <p class="map-hint">
+          Directions light up the 4×3 tunnel grid (4 areas tall, 3 lanes wide).
+          Use the arrows above to jump to adjacent levels and recalculate
+          instantly.
+        </p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Recreates the Astonia 3 tunnel path logic:
+        <code>b1 = rand() % 3</code>, <code>b2 = rand() % 2</code>,
+        <code>c = rand() % 3</code> after seeding
+        <code>srand(playerId × level)</code>.
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
