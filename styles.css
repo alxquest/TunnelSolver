@@ -434,6 +434,22 @@ button:disabled {
   height: 100%;
 }
 
+.tunnel-grid .row-label:first-of-type {
+  border-top-left-radius: 14px;
+}
+
+.tunnel-grid .row-label:last-of-type {
+  border-bottom-left-radius: 14px;
+}
+
+.tunnel-grid .cell[data-area="4"][data-direction="right"] {
+  border-top-right-radius: 14px;
+}
+
+.tunnel-grid .cell[data-area="1"][data-direction="right"] {
+  border-bottom-right-radius: 14px;
+}
+
 .tunnel-grid .row-label {
   display: flex;
   align-items: center;
