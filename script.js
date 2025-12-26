@@ -1,12 +1,17 @@
 class CRand {
   constructor(seed) {
-    this.state = seed >>> 0;
+    // Use BigInt to mirror the 31-bit LCG math used by C's rand()
+    this.state = BigInt.asUintN(32, BigInt(seed));
   }
 
   rand() {
-    // ANSI C style LCG (matches glibc behavior closely)
-    this.state = (Math.imul(1103515245, this.state) + 12345) & 0x7fffffff;
-    return (this.state >>> 16) & 0x7fff;
+    // ANSI C style LCG: (state * 1103515245 + 12345) mod 2^31
+    const a = 1103515245n;
+    const c = 12345n;
+    const m = 2147483648n; // 2^31
+
+    this.state = (this.state * a + c) % m;
+    return Number((this.state / 65536n) % 32768n); // (state >> 16) & 0x7fff
   }
 }
 
