@@ -500,9 +500,10 @@ function updateLevelLabels(level) {
 }
 
 function nudgeLevel(delta) {
-  const current = clampLevel(tunnelLevelInput.value);
+  const current = clampLevel(tunnelLevelInput.value || TUNNEL_MIN_LEVEL);
   const nextLevel = clampLevel(current + delta);
   tunnelLevelInput.value = nextLevel;
+  updateLevelLabels(nextLevel);
   calculate();
 }
 

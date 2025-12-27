@@ -132,6 +132,7 @@ input:focus {
 }
 
 .no-spinner {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
